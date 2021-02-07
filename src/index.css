@@ -213,3 +213,49 @@ Buzzer Control
 .players .player {
   max-width: 200px;
 }
+
+/* 
+------ 
+Buzzer Room
+------
+*/
+
+.buzzer-room {
+  margin: 0 auto;
+  margin-top: 4vh;
+
+  max-width: 40rem;
+
+  text-align: center;
+}
+
+.buzzer-room .buzzer {
+  animation: pulse 0.7s ease infinite;
+
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+
+  box-shadow: var(--darkShadow);
+  background-color: #c5cada;
+
+  border: none;
+  outline: none;
+  user-select: none;
+
+  font-size: 7em;
+  color: #212645;
+
+  cursor: pointer;
+  font-family: "Fredoka One", cursive;
+}
+
+.buzzer-room .buzzer.disabled {
+  animation: none;
+
+  background-color: rgb(70, 70, 70);
+
+  cursor: not-allowed;
+
+  color: var(--textClr);
+}

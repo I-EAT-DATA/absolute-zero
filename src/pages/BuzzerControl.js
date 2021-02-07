@@ -13,10 +13,11 @@ const BuzzerControl = () => {
   const ref = firebase.firestore().collection("rooms")
 
   const [buzzerLocked, setBuzzerLocked] = useState(true)
+  const [timestampUnlocked, setTimestampUnlocked] = useState(new Date().getTime())
   const [players, setPlayers] = useState([])
 
   const deleteRoom = () => {
-    console.log(controlBuzzerCode)
+    // console.log(controlBuzzerCode)
     ref.doc(controlBuzzerCode).delete().catch((err) => console.log(err))
   }
 
@@ -27,7 +28,7 @@ const BuzzerControl = () => {
     window.addEventListener("beforeunload", deleteRoom)
 
     unlisten = history.listen((route) => {
-      console.log(route)
+      // console.log(route)
       deleteRoom()
     })
 
@@ -37,10 +38,11 @@ const BuzzerControl = () => {
       const playerDocs = []
 
       querySnapshot.forEach((doc) => {
+        if (!doc.data().username) { return; }
         playerDocs.push(doc.data())
       })
 
-      console.log(playerDocs);
+      // console.log(playerDocs);
 
       setPlayers(playerDocs)
     })
@@ -61,16 +63,31 @@ const BuzzerControl = () => {
     }
   }, [controlBuzzerCode, user])
 
-  const unlockBuzzers = () => {
+  const toggleBuzzers = () => {
     setBuzzerLocked(!buzzerLocked)
     ref.doc(controlBuzzerCode).update({ buzzerLocked: !buzzerLocked })
+    setTimestampUnlocked(new Date().getTime())
+
+    // if toggleing lock, no player should be buzzed in
+    if (players.length  && !buzzerLocked) {
+      console.log("Is gonna lock, and there are players");
+
+      ref.doc(controlBuzzerCode).collection("players").get().then((querySnapshot) => {
+
+        querySnapshot.forEach((doc) => {
+          ref.doc(controlBuzzerCode).collection("players").doc(doc.id).update({ hasBuzzedIn: false })
+        })
+
+      })
+      
+    }
   }
 
   return (
     <div className="buzzer-control">
       <h1 id="buzzer-code">Buzzer Code: {controlBuzzerCode}</h1>
 
-      <button className="btn" onClick={unlockBuzzers}>{buzzerLocked ? "Unlock Buzzers" : "Lock Buzzers"}</button>
+      <button className="btn" onClick={toggleBuzzers}>{buzzerLocked ? "Unlock Buzzers" : "Lock Buzzers"}</button>
 
       <h1 style={{margin: "20px"}}>{players.length ? "Players:" : "Nobody yet"}</h1>
       <div className="players">
@@ -79,7 +96,7 @@ const BuzzerControl = () => {
             return (
               <div className="player" key={new Date().getTime() + Math.random()}>
                 <h1>{player.username}</h1>
-                <h2>{player.hasBuzzedIn ? `Buzzed in at ${player.timestamp}` : "Has not yet buzzed in."}</h2>
+                <h2>{player.hasBuzzedIn ? `Buzzed in ${(player.timestamp - timestampUnlocked) / 1000}s after buzzer unlocked` : "Has not yet buzzed in."}</h2>
               </div>
             )
           })

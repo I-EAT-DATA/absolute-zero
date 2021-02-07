@@ -5,7 +5,8 @@ import firebase from './firebase'
 const AppContext = React.createContext()
 
 const AppProvider = ({ children }) => {
-  const [playerData, setPlayerData] = useState({ username: "", hasBuzzedIn: false, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+  // firebase.firestore.FieldValue.serverTimestamp()
+  const [playerData, setPlayerData] = useState({ username: "", hasBuzzedIn: false, timestamp: new Date().getTime() })
   const [buzzerCode, setBuzzerCode] = useState("")
   const [user, setUser] = useState()
 

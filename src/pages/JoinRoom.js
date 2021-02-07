@@ -9,9 +9,8 @@ import Modal from '../components/Modal';
 
 const JoinGame = () => {
   const query = useQuery();
-  const { playerData, setPlayerData, user } = useGlobalContext()
+  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, user } = useGlobalContext()
 
-  const [buzzerCode, setBuzzerCode] = useState("")
   const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
   const history = useHistory();
 
