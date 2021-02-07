@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 const Menu = () => {
 
   return (
-    <div>
+    <div className="menu">
 
       <h1>Buzzer</h1>
-      <Link to="/control">Host Room</Link>
-      <Link to="/join">Join Room</Link>
+      <Link className="btn" to="/control">Host Room</Link>
+      <Link className="btn" to="/join">Join Room</Link>
 
     </div>
   )

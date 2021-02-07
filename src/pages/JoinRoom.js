@@ -1,47 +1,70 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { useHistory } from "react-router-dom";
 
 import { useGlobalContext } from '../context'
+import { useQuery } from '../hooks/useQuery'
 import firebase from '../firebase'
 
+import Modal from '../components/Modal';
+
 const JoinGame = () => {
-  const { buzzerCode, setBuzzerCode } = useGlobalContext()
+  const query = useQuery();
+  const { playerData, setPlayerData, user } = useGlobalContext()
+
+  const [buzzerCode, setBuzzerCode] = useState("")
+  const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
+  const history = useHistory();
 
   const ref = firebase.firestore().collection('rooms')
 
   const tryJoinRoom = (e) => {
     e.preventDefault()
 
-    if (!buzzerCode) { return; }
+    if (!buzzerCode || !playerData.username) {
+      setModalData({ isModalOpen: true, modalContent: "Ur leaving fields feeling left out :`(" })
+      return; 
+    }
 
     ref.doc(buzzerCode).get()
       .then((doc) => {
 
-        if (doc.exists) {          
-          const playerData = { canPlay: false, isHost: false, deck: [0, 0, 0, 0] }
-          setGameData({ ...gameData, playerData})
-          ref.doc(gameData.roomCode).collection("players").doc(firebase.auth().currentUser.uid).set(playerData).catch((err) => console.log(err))
+        if (doc.exists) {
+          ref.doc(buzzerCode).collection("players").doc(user.uid).set(playerData).catch((err) => console.log(err))
 
-          ref.doc(gameData.roomCode).update({ players: doc.data().players + 1 })
+          history.push("/room")
 				} 
 				else {
-					// notification popup thing goes here
-          return;
+					setModalData({ isModalOpen: true, modalContent: "Room Not Found :O" })
         }
-
       })
       .catch((error) => {
-
 				console.log("Error getting document:", error)
-				// notification popup thing goes here
-        return;
-        
+        setModalData({ isModalOpen: true, modalContent: "Error Getting Room :`(" })   
 		})
   }
 
+  const tryPopulateCode = () => {
+    const code = query.get("code")
+    if (code && code.length <= 6) { 
+      setBuzzerCode(code)
+    }
+  }
+
+  useEffect(() => {
+    tryPopulateCode()
+  }, [])
+
   return (
-    <div>
-      
-    </div>
+    <form className="join-form" onSubmit={tryJoinRoom}>
+
+      <input className="input" name="username" placeholder="Username" maxLength = "12" autoFocus value={playerData.username} onChange={(e) => setPlayerData({ ...playerData, username: e.target.value })} />
+      <input className="input" name="buzzerCode" placeholder="Buzzer Code" maxLength = "6" value={buzzerCode} onChange={(e) => setBuzzerCode(e.target.value)} />
+
+      <button className="btn" type="submit">Join Room</button>
+
+      {modalData.isModalOpen && <Modal modalContent={modalData.modalContent} closeModal={() => { setModalData({ isModalOpen: false, modalContent: "" }) }} />}
+
+    </form>
   )
 }
 

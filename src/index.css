@@ -1,3 +1,215 @@
+@import url("https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap");
+
+/* 
+------ 
+Variables 
+------
+*/
+
+:root {
+  --darkShadow: 0 19px 38px rgba(0, 0, 0, 0.3), 0 15px 12px rgba(0, 0, 0, 0.22);
+  --borderRadius: 10px;
+  --mainTransition: transform 0.3s;
+
+  --textClr: #eeefe7;
+  --largeFont: 5rem;
+  --smallFont: 2rem;
+}
+
+.dark-theme {
+}
+
+.light-theme {
+}
+
+/* 
+------ 
+Global Styles 
+------
+*/
+
 * {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Fredoka One", cursive;
+
+  background: linear-gradient(
+    90deg,
+    rgba(32, 64, 69, 1) 0%,
+    rgba(33, 38, 69, 1) 100%
+  );
+
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  color: #9cacbf;
+}
+
+a {
+  text-decoration: none;
+  color: var(--textClr);
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  33% {
+    transform: rotateZ(10deg);
+  }
+  67% {
+    transform: rotateZ(-10deg);
+  }
+  100% {
+    transform: rotateZ(0deg);
+  }
+}
+
+@keyframes zoom {
+  0% {
+    transform: scale(0.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.1);
+  }
+}
+
+::selection {
+  background: #364f83;
+}
+
+.btn {
+  /* animation: pulse 2s ease infinite; */
+  transition: var(--mainTransition);
+  box-shadow: var(--darkShadow);
+  border-radius: var(--borderRadius);
+
+  background-color: #35504f;
+  color: var(--textClr);
+
+  padding: 20px;
+  margin: 10px;
+
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  font-family: "Fredoka One", cursive;
+  font-size: var(--smallFont);
+}
+
+.btn:hover {
+  transform: scale(1.1);
+}
+
+.input {
+  transition: var(--mainTransition);
+  box-shadow: var(--darkShadow);
+  border-radius: var(--borderRadius);
+
+  background-color: #c5cada;
+
+  padding: 25px;
+  margin: 30px;
+
+  border: none;
+  outline: none;
+
+  text-align: center;
+  font-family: "Fredoka One", cursive;
+  font-size: var(--smallFont);
+}
+
+.input:hover {
+  transform: scale(1.1);
+}
+
+.modal {
+  animation: zoom 3.1s cubic-bezier(0.215, 0.61, 0.355, 1);
+
+  color: #d14d4a;
+  margin: 20px;
+}
+
+/* 
+------ 
+Menu
+------
+*/
+
+.menu {
+  margin: 0 auto;
+  margin-top: 4vh;
+
+  max-width: 30rem;
+
+  text-align: center;
+}
+
+.menu h1 {
+  font-size: var(--largeFont);
+
+  margin: 50px;
+}
+
+/* 
+------ 
+Join Game
+------
+*/
+
+.join-form {
+  margin: 0 auto;
+  margin-top: 4vh;
+
+  max-width: 30rem;
+
+  text-align: center;
+}
+
+/* 
+------ 
+Buzzer Control
+------
+*/
+
+.buzzer-control {
+  margin: 0 auto;
+  margin-top: 4vh;
+
+  max-width: 40rem;
+
+  text-align: center;
+}
+
+.buzzer-control #buzzer-code {
+  margin: 20px;
+}
+
+.players {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.players .player {
+  max-width: 200px;
 }
