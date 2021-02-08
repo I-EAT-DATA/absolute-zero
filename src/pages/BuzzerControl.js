@@ -26,9 +26,7 @@ const BuzzerControl = () => {
     ref.doc(controlBuzzerCode).set({ host: user.uid , buzzerLocked: true }).catch((err) => console.log(err))
 
     window.addEventListener("beforeunload", deleteRoom)
-
-    unlisten = history.listen((route) => {
-      // console.log(route)
+    unlisten = history.listen(() => {
       deleteRoom()
     })
 
@@ -71,7 +69,7 @@ const BuzzerControl = () => {
 
     // if toggleing lock, no player should be buzzed in
     if (players.length  && !buzzerLocked) {
-      console.log("Is gonna lock, and there are players");
+      // console.log("Is gonna lock, and there are players");
 
       ref.doc(controlBuzzerCode).collection("players").get().then((querySnapshot) => {
 

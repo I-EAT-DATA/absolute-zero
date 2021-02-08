@@ -19,16 +19,12 @@ function App() {
           <Menu />
         </Route>
 
-        <Route exact path={"/join"}>
+        <Route exact path={"/room"}>
           <JoinRoom />
         </Route>
 
         <Route exact path={"/control"}>
           <BuzzerControl />
-        </Route>
-
-        <Route exact path={"/room"}>
-          <BuzzerRoom />
         </Route>
 
         <Route path={"*"}>

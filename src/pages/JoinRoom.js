@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import { useHistory } from "react-router-dom";
 
 import { useGlobalContext } from '../context'
 import { useQuery } from '../hooks/useQuery'
 import firebase from '../firebase'
 
+import BuzzerRoom from './BuzzerRoom'
 import Modal from '../components/Modal';
 
 const JoinGame = () => {
   const query = useQuery();
-  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, user } = useGlobalContext()
+  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, user } = useGlobalContext()
 
-  const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
-  const history = useHistory();
+  const [inRoom, setInRoom] = useState(false)
 
   const ref = firebase.firestore().collection('rooms')
 
@@ -30,7 +29,7 @@ const JoinGame = () => {
         if (doc.exists) {
           ref.doc(buzzerCode).collection("players").doc(user.uid).set(playerData).catch((err) => console.log(err))
 
-          history.push("/room")
+          setInRoom(true)
 				} 
 				else {
 					setModalData({ isModalOpen: true, modalContent: "Room Not Found :O" })
@@ -52,6 +51,12 @@ const JoinGame = () => {
   useEffect(() => {
     tryPopulateCode()
   }, [])
+
+  if (inRoom) {
+    return (
+      <BuzzerRoom />
+    )
+  }
 
   return (
     <form className="join-form" onSubmit={tryJoinRoom}>

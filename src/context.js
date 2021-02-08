@@ -8,6 +8,7 @@ const AppProvider = ({ children }) => {
   // firebase.firestore.FieldValue.serverTimestamp()
   const [playerData, setPlayerData] = useState({ username: "", hasBuzzedIn: false, timestamp: new Date().getTime() })
   const [buzzerCode, setBuzzerCode] = useState("")
+  const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
   const [user, setUser] = useState()
 
   const initUser = () => {
@@ -35,7 +36,7 @@ const AppProvider = ({ children }) => {
   }, [])
 
 
-  return <AppContext.Provider value={ {playerData, setPlayerData, buzzerCode, setBuzzerCode, user, setUser} }>{children}</AppContext.Provider>
+  return <AppContext.Provider value={ { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, user } }>{children}</AppContext.Provider>
 }
 
 export const useGlobalContext = () => {

@@ -8,7 +8,7 @@ const Menu = () => {
 
       <h1>Buzzer</h1>
       <Link className="btn" to="/control">Host Room</Link>
-      <Link className="btn" to="/join">Join Room</Link>
+      <Link className="btn" to="/room">Join Room</Link>
 
     </div>
   )
