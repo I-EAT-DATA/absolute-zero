@@ -212,6 +212,17 @@ Buzzer Control
 
 .players .player {
   max-width: 200px;
+  margin: 10px;
+  padding: 10px;
+
+  color: #c5cada;
+  background: #35504f;
+  box-shadow: var(--darkShadow);
+  border-radius: var(--borderRadius);
+}
+
+.players .player.winner {
+  background: #35504f;
 }
 
 /* 
@@ -253,7 +264,7 @@ Buzzer Room
 .buzzer-room .buzzer.disabled {
   animation: none;
 
-  background-color: rgb(70, 70, 70);
+  background-color: #464646;
 
   cursor: not-allowed;
 

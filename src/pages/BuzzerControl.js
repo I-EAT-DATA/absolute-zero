@@ -51,7 +51,8 @@ const BuzzerControl = () => {
   useEffect(() => {
     setControlBuzzerCode(Math.random().toString().substr(2, 6))
 
-    // setPlayers([{ username: "kamala", timestamp: new Date().toLocaleTimeString(), hasBuzzedIn: true }, { username: "joe", timestamp: new Date().toLocaleTimeString(), hasBuzzedIn: true }])
+    // setTimestampUnlocked(new Date().getTime())
+    // setPlayers([{ username: "test1", timestamp: new Date().getTime() + 1000, hasBuzzedIn: true }, { username: "test2", timestamp: new Date().getTime() + 100, hasBuzzedIn: true }])
   }, [])
 
   useEffect(() => {
@@ -95,7 +96,7 @@ const BuzzerControl = () => {
           players.map((player) => {
             return (
               <div className="player" key={new Date().getTime() + Math.random()}>
-                <h1>{player.username}</h1>
+                <h1 style={{color: `hsl(0, 0%, ${600 / ((player.timestamp - timestampUnlocked) / 100)}%)`}}>{player.username}</h1>
                 <h2>{player.hasBuzzedIn ? `Buzzed in ${(player.timestamp - timestampUnlocked) / 1000}s after buzzer unlocked` : "Has not yet buzzed in."}</h2>
               </div>
             )
