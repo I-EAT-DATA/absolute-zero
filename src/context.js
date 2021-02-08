@@ -9,6 +9,7 @@ const AppProvider = ({ children }) => {
   const [playerData, setPlayerData] = useState({ username: "", hasBuzzedIn: false, timestamp: new Date().getTime() })
   const [buzzerCode, setBuzzerCode] = useState("")
   const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
+  const [inRoom, setInRoom] = useState(false)
   const [user, setUser] = useState()
 
   const initUser = () => {
@@ -36,7 +37,7 @@ const AppProvider = ({ children }) => {
   }, [])
 
 
-  return <AppContext.Provider value={ { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, user } }>{children}</AppContext.Provider>
+  return <AppContext.Provider value={ { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, inRoom, setInRoom, user } }>{children}</AppContext.Provider>
 }
 
 export const useGlobalContext = () => {

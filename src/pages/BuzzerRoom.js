@@ -9,7 +9,7 @@ const BuzzerRoom = () => {
   let unlisten = () => {}
 
   const ref = firebase.firestore().collection("rooms")
-  const { buzzerCode, setModalData, user } = useGlobalContext()
+  const { buzzerCode, setModalData, setInRoom, user } = useGlobalContext()
 
   const [buzzerLocked, setBuzzerLocked] = useState(false)
 
@@ -26,8 +26,8 @@ const BuzzerRoom = () => {
         setBuzzerLocked(querySnapshot.data().buzzerLocked)
       } catch (error) {
         console.log(error);
-        history.push("/room")
-        setModalData({ isModalOpen: true, modalContent: "Room Has Vanished :O" })
+        setInRoom(false)
+        setModalData({ isModalOpen: true, modalContent: "Room Has Vanished ＞﹏＜" })
       }
     })
 

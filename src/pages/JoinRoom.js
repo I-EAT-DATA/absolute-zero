@@ -9,10 +9,8 @@ import Modal from '../components/Modal';
 
 const JoinGame = () => {
   const query = useQuery();
-  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, user } = useGlobalContext()
-
-  const [inRoom, setInRoom] = useState(false)
-
+  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, inRoom, setInRoom, user } = useGlobalContext()
+  
   const ref = firebase.firestore().collection('rooms')
 
   const tryJoinRoom = (e) => {
