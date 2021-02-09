@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
+import useSound from 'use-sound';
 
 import firebase from '../firebase'
 import { useGlobalContext } from '../context'
+
+import buzz from '../assets/buzzer.wav'
 
 const BuzzerRoom = () => {
   const history = useHistory()
@@ -13,6 +16,8 @@ const BuzzerRoom = () => {
 
   const [buzzerLocked, setBuzzerLocked] = useState(false)
 
+  const [playBuzz] = useSound(buzz)
+
   const deletePlayer = () => {
     ref.doc(buzzerCode).collection("players").doc(user.uid).delete().catch((err) => console.log(err))
   }
@@ -21,7 +26,7 @@ const BuzzerRoom = () => {
 
     ref.doc(buzzerCode).onSnapshot((querySnapshot) => {
       try {
-        console.log(querySnapshot.data());
+        // console.log(querySnapshot.data());
 
         setBuzzerLocked(querySnapshot.data().buzzerLocked)
       } catch (error) {
@@ -48,6 +53,7 @@ const BuzzerRoom = () => {
     if (buzzerLocked) { return; }
     setBuzzerLocked(true)
     ref.doc(buzzerCode).collection("players").doc(user.uid).update({ hasBuzzedIn: true, timestamp: new Date().getTime() }).catch((err) => console.log(err))
+    playBuzz()
   }
 
   return (
