@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom'
 import firebase from '../firebase'
 import { useGlobalContext } from '../context'
 
-const BuzzerControl = () => {
+const HostSettings = () => {
   const history = useHistory()
   let unlisten = () => {}
 
@@ -32,7 +32,7 @@ const BuzzerControl = () => {
 
     ref.doc(controlBuzzerCode).collection("players").doc("temp").set({})
 
-    ref.doc(controlBuzzerCode).collection("players").onSnapshot((querySnapshot) => {
+    ref.doc(controlBuzzerCode).collection("players").limit(4).onSnapshot((querySnapshot) => {
       const playerDocs = []
 
       querySnapshot.forEach((doc) => {
@@ -83,7 +83,7 @@ const BuzzerControl = () => {
   }
 
   return (
-    <div className="buzzer-control">
+    <div className="center">
       <h1 id="buzzer-code">Buzzer Code: {controlBuzzerCode}</h1>
 
       <button className="btn" onClick={toggleBuzzers}>{buzzerLocked ? "Unlock Buzzers" : "Lock Buzzers"}</button>
@@ -108,4 +108,4 @@ const BuzzerControl = () => {
   )
 }
 
-export default BuzzerControl
+export default HostSettings

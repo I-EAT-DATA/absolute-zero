@@ -4,11 +4,15 @@ import { Link } from 'react-router-dom';
 const Menu = () => {
 
   return (
-    <div className="menu">
+    <div className="menu center">
 
-      <h1>Buzzer</h1>
-      <Link className="btn" to="/control">Host Room</Link>
-      <Link className="btn" to="/room">Join Room</Link>
+      <h1>Absolute Zero</h1>
+
+      <div className="menu-buttons">
+        <Link className="btn" to="/control">Host Game</Link>
+        <Link className="btn" to="/game">Join Game</Link>
+        <Link className="btn" to="/find">Find Game</Link>
+      </div>
 
     </div>
   )

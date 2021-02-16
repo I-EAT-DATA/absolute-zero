@@ -4,37 +4,40 @@ import { useGlobalContext } from '../context'
 import { useQuery } from '../hooks/useQuery'
 import firebase from '../firebase'
 
-import BuzzerRoom from './BuzzerRoom'
+import Game from './Game'
 import Modal from '../components/Modal';
 
 const JoinGame = () => {
   const query = useQuery();
-  const { playerData, setPlayerData, buzzerCode, setBuzzerCode, modalData, setModalData, inRoom, setInRoom, user } = useGlobalContext()
+  const { playerData, setPlayerData, gameCode, setGameCode, modalData, setModalData, inGame, setInGame, user } = useGlobalContext()
   
-  const ref = firebase.firestore().collection('rooms')
+  const ref = firebase.firestore().collection('games')
 
   const tryJoinRoom = (e) => {
     e.preventDefault()
 
-    if (!buzzerCode || !playerData.username) {
+    if (!gameCode || !playerData.username) {
+      closeModal()
       setModalData({ isModalOpen: true, modalContent: "Ur leaving fields feeling left out :`(" })
       return; 
     }
 
-    ref.doc(buzzerCode).get()
+    ref.doc(gameCode).get()
       .then((doc) => {
 
         if (doc.exists) {
-          ref.doc(buzzerCode).collection("players").doc(user.uid).set(playerData).catch((err) => console.log(err))
+          ref.doc(gameCode).collection("players").doc(user.uid).set(playerData).catch((err) => console.log(err))
 
-          setInRoom(true)
+          setInGame(true)
 				} 
 				else {
+          closeModal()
 					setModalData({ isModalOpen: true, modalContent: "Room Not Found :O" })
         }
       })
       .catch((error) => {
 				console.log("Error getting document:", error)
+        closeModal()
         setModalData({ isModalOpen: true, modalContent: "Error Getting Room :`(" })   
 		})
   }
@@ -42,7 +45,7 @@ const JoinGame = () => {
   const tryPopulateCode = () => {
     const code = query.get("code")
     if (code && code.length <= 6) { 
-      setBuzzerCode(code)
+      setGameCode(code)
     }
   }
 
@@ -50,21 +53,25 @@ const JoinGame = () => {
     tryPopulateCode()
   }, [])
 
-  if (inRoom) {
+  const closeModal = () => {
+    setModalData({ isModalOpen: false, modalContent: "" })
+  }
+
+  if (inGame) {
     return (
-      <BuzzerRoom />
+      <Game />
     )
   }
 
   return (
-    <form className="join-form" onSubmit={tryJoinRoom}>
+    <form className="join-game center" onSubmit={tryJoinRoom}>
 
       <input className="input" name="username" placeholder="Username" maxLength = "12" autoFocus value={playerData.username} onChange={(e) => setPlayerData({ ...playerData, username: e.target.value })} />
-      <input className="input" name="buzzerCode" placeholder="Buzzer Code" maxLength = "6" value={buzzerCode} onChange={(e) => setBuzzerCode(e.target.value)} />
+      <input className="input" name="gameCode" placeholder="Game Code" maxLength = "6" value={gameCode} onChange={(e) => setGameCode(e.target.value)} />
 
       <button className="btn" type="submit">Join Room</button>
 
-      {modalData.isModalOpen && <Modal modalContent={modalData.modalContent} closeModal={() => { setModalData({ isModalOpen: false, modalContent: "" }) }} />}
+      {modalData.isModalOpen && <Modal modalContent={modalData.modalContent} closeModal={closeModal} />}
 
     </form>
   )

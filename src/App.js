@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
 // pages
 import Menu from './pages/Menu'
-import JoinRoom from './pages/JoinRoom'
-import BuzzerControl from './pages/BuzzerControl'
-import BuzzerRoom from './pages/BuzzerRoom'
+import JoinGame from './pages/JoinGame'
+import FindGame from './pages/FindGame'
 import NotFound from './pages/NotFound'
 
 function App() {
@@ -19,12 +18,12 @@ function App() {
           <Menu />
         </Route>
 
-        <Route exact path={"/room"}>
-          <JoinRoom />
+        <Route exact path={"/game"}>
+          <JoinGame />
         </Route>
 
-        <Route exact path={"/control"}>
-          <BuzzerControl />
+        <Route exact path={"/find"}>
+          <FindGame />
         </Route>
 
         <Route path={"*"}>

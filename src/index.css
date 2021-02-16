@@ -148,10 +148,19 @@ a {
 }
 
 .modal {
-  animation: zoom 3.1s cubic-bezier(0.215, 0.61, 0.355, 1);
+  animation: zoom 3.1s ease;
 
   color: #d14d4a;
   margin: 20px;
+}
+
+.center {
+  margin: 0 auto;
+  margin-top: 4vh;
+
+  max-width: 40rem;
+
+  text-align: center;
 }
 
 /* 
@@ -160,34 +169,44 @@ Menu
 ------
 */
 
-.menu {
-  margin: 0 auto;
-  margin-top: 4vh;
-
-  max-width: 30rem;
-
-  text-align: center;
-}
-
 .menu h1 {
-  font-size: var(--largeFont);
+  font-size: 3.5rem;
 
   margin: 50px;
 }
 
+.menu .menu-buttons {
+  display: inline-flex;
+  flex-wrap: wrap;
+
+  justify-content: center;
+}
+
 /* 
 ------ 
-Join Game
+Find Game
 ------
 */
 
-.join-form {
-  margin: 0 auto;
-  margin-top: 4vh;
+.open-game {
+  transition: var(--mainTransition);
 
-  max-width: 30rem;
+  max-width: 200px;
+  margin: 0 auto 20px;
+  padding: 20px;
 
-  text-align: center;
+  font-size: 1.3rem;
+
+  color: #c5cada;
+  background: #35504f;
+  box-shadow: var(--darkShadow);
+  border-radius: var(--borderRadius);
+
+  cursor: pointer;
+}
+
+.open-game:hover {
+  transform: scale(1.1);
 }
 
 /* 
@@ -195,15 +214,6 @@ Join Game
 Buzzer Control
 ------
 */
-
-.buzzer-control {
-  margin: 0 auto;
-  margin-top: 4vh;
-
-  max-width: 40rem;
-
-  text-align: center;
-}
 
 .buzzer-control #buzzer-code {
   margin: 20px;
@@ -234,15 +244,6 @@ Buzzer Control
 Buzzer Room
 ------
 */
-
-.buzzer-room {
-  margin: 0 auto;
-  margin-top: 4vh;
-
-  max-width: 40rem;
-
-  text-align: center;
-}
 
 .buzzer-room .buzzer {
   animation: pulse 0.7s ease infinite;
