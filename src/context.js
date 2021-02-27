@@ -6,7 +6,7 @@ const AppContext = React.createContext()
 
 const AppProvider = ({ children }) => {
   // firebase.firestore.FieldValue.serverTimestamp()
-  const [playerData, setPlayerData] = useState({ username: "", deck: [0, 0, 0, 0] })
+  const [playerData, setPlayerData] = useState({ username: "", absoluteZeroPressed: false, deck: [] })
   const [gameCode, setGameCode] = useState("")
   const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
   const [inGame, setInGame] = useState(false)
@@ -34,8 +34,11 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     initUser()
-  }, [])
 
+    for (let i = 0; i < 4; i++) {
+      playerData.deck.push(Math.floor(Math.random() * 20) - 10)
+    }
+  }, [])
 
   return <AppContext.Provider value={ { playerData, setPlayerData, gameCode, setGameCode, modalData, setModalData, inGame, setInGame, user } }>{children}</AppContext.Provider>
 }

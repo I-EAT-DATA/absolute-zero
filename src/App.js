@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import Menu from './pages/Menu'
 import JoinGame from './pages/JoinGame'
 import FindGame from './pages/FindGame'
+import HostSettings from './pages/HostSettings'
 import NotFound from './pages/NotFound'
 
 function App() {
@@ -24,6 +25,10 @@ function App() {
 
         <Route exact path={"/find"}>
           <FindGame />
+        </Route>
+
+        <Route exact path={"/settings"}>
+          <HostSettings />
         </Route>
 
         <Route path={"*"}>

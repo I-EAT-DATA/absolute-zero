@@ -1,5 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'
+
+import HostButton from '../components/HostButton'
 
 const Menu = () => {
 
@@ -9,7 +11,8 @@ const Menu = () => {
       <h1>Absolute Zero</h1>
 
       <div className="menu-buttons">
-        <Link className="btn" to="/control">Host Game</Link>
+        {/* <Link className="btn" to="/settings">Host Game</Link> */}
+        <HostButton />
         <Link className="btn" to="/game">Join Game</Link>
         <Link className="btn" to="/find">Find Game</Link>
       </div>

@@ -9,7 +9,7 @@ const GameRoom = () => {
   const history = useHistory()
   let unlisten = () => {}
 
-  const ref = firebase.firestore().collection("rooms")
+  const ref = firebase.firestore().collection("games")
   const { gameCode, setModalData, setInGame, user } = useGlobalContext()
 
   const deletePlayer = () => {
@@ -45,6 +45,8 @@ const GameRoom = () => {
   return (
     <div className="center">
       {/* <button className={`buzzer ${buzzerLocked && "disabled"}`} onClick={buzzIn} >Buzz In</button> */}
+
+      
     </div>
   )
 }

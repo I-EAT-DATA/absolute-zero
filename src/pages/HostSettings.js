@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 
 import firebase from '../firebase'
@@ -26,7 +26,8 @@ const HostSettings = () => {
     ref.doc(controlBuzzerCode).set({ host: user.uid , buzzerLocked: true }).catch((err) => console.log(err))
 
     window.addEventListener("beforeunload", deleteRoom)
-    unlisten = history.listen(() => {
+    unlisten = history.listen((route) => {
+      // if (route == "/join" || route == "/game") { return; }
       deleteRoom()
     })
 
