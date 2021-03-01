@@ -7,7 +7,7 @@ import { useGlobalContext } from '../context'
 
 const GameRoom = () => {
   const history = useHistory()
-  let unlisten = () => {}
+  const [unlisten, setUnlisten] = useState(() => {})
 
   const ref = firebase.firestore().collection("games")
   const { gameCode, setModalData, setInGame, user } = useGlobalContext()
@@ -37,13 +37,15 @@ const GameRoom = () => {
   const getPlayerData = () => {
     ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
       const playerDocs = []
+      let newScores = {}
 
       querySnapshot.forEach((doc) => {
         playerDocs.push(doc.data())
+        newScores = { ...newScores, [doc.id]: doc.data().deck.reduce((a, b) => a + b, 0) }
       })
 
       if (isHost) {
-        ref.doc(gameCode).update({  })
+        ref.doc(gameCode).set({ newScores }, { merge: true })
       }
 
       setPlayerData(playerDocs)
@@ -51,7 +53,7 @@ const GameRoom = () => {
   }
 
   const checkIsHost = () => {
-    if (gameData.host == user.uid) {
+    if (gameData.host === user.uid) {
       setIsHost(true)
     }
     else {
@@ -60,15 +62,11 @@ const GameRoom = () => {
   }
 
   useEffect(() => {
-
-    getGameData()
-    getPlayerData()
-
     window.addEventListener("beforeunload", deletePlayer)
-    unlisten = history.listen((route) => {
+    setUnlisten(history.listen((route) => {
       console.log(route)
       deletePlayer()
-    })
+    }))
 
     return () => {
       window.removeEventListener("beforeunload", deletePlayer)
@@ -78,9 +76,18 @@ const GameRoom = () => {
   }, [])
 
   useEffect(() => {
+    getGameData()
+  }, [])
+
+  useEffect(() => {
     if (!gameData) { return; }
     checkIsHost()
   }, [gameData])
+
+  useEffect(() => {
+    if (!isHost) { return; }
+    getPlayerData()
+  }, [isHost])
 
   return (
     <div className="center">
