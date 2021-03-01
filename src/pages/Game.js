@@ -12,8 +12,8 @@ const GameRoom = () => {
   const ref = firebase.firestore().collection("games")
   const { gameCode, setModalData, setInGame, user } = useGlobalContext()
 
-  const [gameData, setGameData] = useState([])
-  const [playerData, setPlayerData] = useState([])
+  const [gameData, setGameData] = useState()
+  const [playerData, setPlayerData] = useState({})
 
   const [isHost, setIsHost] = useState()
 
@@ -36,16 +36,16 @@ const GameRoom = () => {
 
   const getPlayerData = () => {
     ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
-      const playerDocs = []
-      let newScores = {}
+      let playerDocs = {}
 
-      querySnapshot.forEach((doc) => {
-        playerDocs.push(doc.data())
-        newScores = { ...newScores, [doc.id]: doc.data().deck.reduce((a, b) => a + b, 0) }
+      querySnapshot.forEach((doc) => { 
+        playerDocs = { ...playerDocs, [doc.id]: doc.data() } 
       })
 
       if (isHost) {
-        ref.doc(gameCode).set({ newScores }, { merge: true })
+        const newScores = Object.keys(playerDocs).map((key) => { return { [key]: playerDocs[key].deck.reduce((a, b) => a + b, 0) } })
+        console.log(playerDocs);
+        ref.doc(gameCode).set(newScores)
       }
 
       setPlayerData(playerDocs)
@@ -62,6 +62,10 @@ const GameRoom = () => {
   }
 
   useEffect(() => {
+
+    getGameData()
+    getPlayerData()
+
     window.addEventListener("beforeunload", deletePlayer)
     setUnlisten(history.listen((route) => {
       console.log(route)
@@ -76,24 +80,16 @@ const GameRoom = () => {
   }, [])
 
   useEffect(() => {
-    getGameData()
-  }, [])
-
-  useEffect(() => {
     if (!gameData) { return; }
+    console.log(gameData)
     checkIsHost()
   }, [gameData])
-
-  useEffect(() => {
-    if (!isHost) { return; }
-    getPlayerData()
-  }, [isHost])
 
   return (
     <div className="center">
 
       {
-        playerData.map((player, c) => {
+        Object.values(playerData).map((player, c) => {
           return (
             <div key={new Date().getTime() + Math.random()}>
               <h1>{player.username}</h1>
