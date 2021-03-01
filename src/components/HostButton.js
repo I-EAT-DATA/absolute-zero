@@ -6,7 +6,7 @@ import { useGlobalContext } from '../context'
 
 const HostButton = () => {
   const ref = firebase.firestore().collection("games")
-  const { gameCode, setGameCode, user } = useGlobalContext()
+  const { gameCode, setGameCode, playerData, user } = useGlobalContext()
 
   const history = useHistory()
   let unlisten = () => {}
@@ -23,7 +23,17 @@ const HostButton = () => {
     const newGameCode = Math.random().toString().substr(2, 6)
     setGameCode(newGameCode)
 
-    ref.doc(newGameCode).set({ host: user.uid , isPrivate: false, isStarted: false, numPlayers: 1 }).catch((err) => console.log(err))
+    const gameData = {
+      host: user.uid , 
+      isPrivate: false, 
+      isStarted: false, 
+      numPlayers: 1, 
+      scores: { 
+        [user.uid]: playerData.deck.reduce((a, b) => a + b, 0)
+      }
+    }
+
+    ref.doc(newGameCode).set(gameData).catch((err) => console.log(err))
 
     // ref.doc(newGameCode).collection("players").doc("temp").set({})
   }

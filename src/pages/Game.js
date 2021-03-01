@@ -12,15 +12,19 @@ const GameRoom = () => {
   const ref = firebase.firestore().collection("games")
   const { gameCode, setModalData, setInGame, user } = useGlobalContext()
 
+  const [gameData, setGameData] = useState([])
+  const [playerData, setPlayerData] = useState([])
+
+  const [isHost, setIsHost] = useState()
+
   const deletePlayer = () => {
     ref.doc(gameCode).collection("players").doc(user.uid).delete().catch((err) => console.log(err))
   }
 
-  useEffect(() => {
-
+  const getGameData = () => {
     ref.doc(gameCode).onSnapshot((querySnapshot) => {
       try {
-        console.log(querySnapshot.data())
+        setGameData(querySnapshot.data())
       } catch (error) {
         console.log(error)
 
@@ -28,6 +32,37 @@ const GameRoom = () => {
         setModalData({ isModalOpen: true, modalContent: "Game Has Vanished ＞﹏＜" })
       }
     })
+  }
+
+  const getPlayerData = () => {
+    ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
+      const playerDocs = []
+
+      querySnapshot.forEach((doc) => {
+        playerDocs.push(doc.data())
+      })
+
+      if (isHost) {
+        ref.doc(gameCode).update({  })
+      }
+
+      setPlayerData(playerDocs)
+    })
+  }
+
+  const checkIsHost = () => {
+    if (gameData.host == user.uid) {
+      setIsHost(true)
+    }
+    else {
+      setIsHost(false)
+    }
+  }
+
+  useEffect(() => {
+
+    getGameData()
+    getPlayerData()
 
     window.addEventListener("beforeunload", deletePlayer)
     unlisten = history.listen((route) => {
@@ -42,10 +77,28 @@ const GameRoom = () => {
   
   }, [])
 
+  useEffect(() => {
+    if (!gameData) { return; }
+    checkIsHost()
+  }, [gameData])
+
   return (
     <div className="center">
-      {/* <button className={`buzzer ${buzzerLocked && "disabled"}`} onClick={buzzIn} >Buzz In</button> */}
 
+      {
+        playerData.map((player, c) => {
+          return (
+            <div key={new Date().getTime() + Math.random()}>
+              <h1>{player.username}</h1>
+              <h4>{c + 1}</h4>
+            </div>
+          )
+        })
+      }
+
+      {
+        isHost && <button className="btn">Yey</button>
+      }
       
     </div>
   )
