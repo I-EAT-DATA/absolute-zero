@@ -5,9 +5,9 @@ import useSound from 'use-sound';
 import firebase from '../firebase'
 import { useGlobalContext } from '../context'
 
-const GameRoom = () => {
-  const history = useHistory()
-  const [unlisten, setUnlisten] = useState(() => {})
+const GameLobby = () => {
+  // const history = useHistory()
+  // const [unlisten, setUnlisten] = useState(() => {})
 
   const ref = firebase.firestore().collection("games")
   const { gameCode, setModalData, setInGame, user } = useGlobalContext()
@@ -15,7 +15,7 @@ const GameRoom = () => {
   const [gameData, setGameData] = useState()
   const [playerData, setPlayerData] = useState({})
 
-  const [isHost, setIsHost] = useState()
+  const [isHost, setIsHost] = useState(false)
 
   const deletePlayer = () => {
     ref.doc(gameCode).collection("players").doc(user.uid).delete().catch((err) => console.log(err))
@@ -42,21 +42,17 @@ const GameRoom = () => {
         playerDocs = { ...playerDocs, [doc.id]: doc.data() } 
       })
 
-      if (isHost) {
-        const newScores = Object.keys(playerDocs).map((key) => { return { [key]: playerDocs[key].deck.reduce((a, b) => a + b, 0) } })
-        console.log(playerDocs);
-        ref.doc(gameCode).set(newScores)
-      }
-
       setPlayerData(playerDocs)
     })
   }
 
   const checkIsHost = () => {
     if (gameData.host === user.uid) {
+      console.log("IS HOST");
       setIsHost(true)
     }
     else {
+      console.log("IS NOT HOST");
       setIsHost(false)
     }
   }
@@ -67,44 +63,61 @@ const GameRoom = () => {
     getPlayerData()
 
     window.addEventListener("beforeunload", deletePlayer)
-    setUnlisten(history.listen((route) => {
-      console.log(route)
-      deletePlayer()
-    }))
+    // setUnlisten(history.listen((route) => {
+    //   console.log(route)
+    //   deletePlayer()
+    // }))
 
     return () => {
       window.removeEventListener("beforeunload", deletePlayer)
-      unlisten()
+      // unlisten()
     }
   
   }, [])
 
   useEffect(() => {
     if (!gameData) { return; }
-    console.log(gameData)
     checkIsHost()
+    console.log(gameData)
   }, [gameData])
+
+  useEffect(() => {
+    console.log(isHost);
+    if (!isHost) { return; }
+
+    let newScores = {}
+
+    Object.keys(playerData).forEach((playerKey) => { 
+      newScores = { ...newScores, [playerKey]: playerData[playerKey].deck.reduce((a, b) => a + b, 0) } 
+    })
+
+    ref.doc(gameCode).update({ scores: newScores })
+    
+  }, [playerData])
 
   return (
     <div className="center">
 
       {
-        Object.values(playerData).map((player, c) => {
-          return (
-            <div key={new Date().getTime() + Math.random()}>
-              <h1>{player.username}</h1>
-              <h4>{c + 1}</h4>
-            </div>
-          )
-        })
+        isHost && <button className="btn">Start</button>
       }
 
-      {
-        isHost && <button className="btn">Yey</button>
-      }
+      <h1>Players:</h1>
+      <div className="players">
+        {
+          Object.values(playerData).reverse().map((player, c) => {
+            return (
+              <div className="player" key={new Date().getTime() + Math.random()}>
+                <h1>{player.username}</h1>
+                <h2 style={{textAlign: "right", margin: "5px"}}>{c + 1}</h2>
+              </div>
+            )
+          })
+        }
+      </div>
       
     </div>
   )
 }
 
-export default GameRoom
+export default GameLobby

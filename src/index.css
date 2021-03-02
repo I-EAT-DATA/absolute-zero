@@ -211,7 +211,7 @@ Find Game
 
 /* 
 ------ 
-Buzzer Control
+Game Lobby/Game
 ------
 */
 
@@ -226,6 +226,7 @@ Buzzer Control
 
 .players .player {
   max-width: 200px;
+  min-width: 100px;
   margin: 10px;
   padding: 10px;
 
@@ -233,45 +234,4 @@ Buzzer Control
   background: #35504f;
   box-shadow: var(--darkShadow);
   border-radius: var(--borderRadius);
-}
-
-.players .player.winner {
-  background: #35504f;
-}
-
-/* 
------- 
-Buzzer Room
-------
-*/
-
-.buzzer-room .buzzer {
-  animation: pulse 0.7s ease infinite;
-
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-
-  box-shadow: var(--darkShadow);
-  background-color: #c5cada;
-
-  border: none;
-  outline: none;
-  user-select: none;
-
-  font-size: 7em;
-  color: #212645;
-
-  cursor: pointer;
-  font-family: "Fredoka One", cursive;
-}
-
-.buzzer-room .buzzer.disabled {
-  animation: none;
-
-  background-color: #464646;
-
-  cursor: not-allowed;
-
-  color: var(--textClr);
 }

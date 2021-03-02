@@ -4,7 +4,7 @@ import { useGlobalContext } from '../context'
 import { useQuery } from '../hooks/useQuery'
 import firebase from '../firebase'
 
-import Game from './Game'
+import GameLobby from './GameLobby'
 import Modal from '../components/Modal';
 
 const JoinGame = () => {
@@ -59,7 +59,7 @@ const JoinGame = () => {
 
   if (inGame) {
     return (
-      <Game />
+      <GameLobby />
     )
   }
 
