@@ -5,6 +5,8 @@ import useSound from 'use-sound';
 import firebase from '../firebase'
 import { useGlobalContext } from '../context'
 
+import Player from '../components/Player'
+
 const GameLobby = () => {
   // const history = useHistory()
   // const [unlisten, setUnlisten] = useState(() => {})
@@ -18,6 +20,7 @@ const GameLobby = () => {
   const [isHost, setIsHost] = useState(false)
 
   const deletePlayer = () => {
+    if (isHost) { return; }
     ref.doc(gameCode).collection("players").doc(user.uid).delete().catch((err) => console.log(err))
   }
 
@@ -48,11 +51,9 @@ const GameLobby = () => {
 
   const checkIsHost = () => {
     if (gameData.host === user.uid) {
-      console.log("IS HOST");
       setIsHost(true)
     }
     else {
-      console.log("IS NOT HOST");
       setIsHost(false)
     }
   }
@@ -91,15 +92,23 @@ const GameLobby = () => {
       newScores = { ...newScores, [playerKey]: playerData[playerKey].deck.reduce((a, b) => a + b, 0) } 
     })
 
-    ref.doc(gameCode).update({ scores: newScores })
+    ref.doc(gameCode).update({ numPlayers: Object.keys(playerData).length, scores: newScores })
     
   }, [playerData])
+
+  const startGame = () => {
+    ref.doc(gameCode).update({ isStarted: true })
+  }
 
   return (
     <div className="center">
 
+      {/* {
+        gameData.isStarted && <Game />
+      } */}
+
       {
-        isHost && <button className="btn">Start</button>
+        isHost && !gameData.isStarted && <button className="btn" onClick={startGame}>Start</button>
       }
 
       <h1>Players:</h1>
@@ -107,10 +116,7 @@ const GameLobby = () => {
         {
           Object.values(playerData).reverse().map((player, c) => {
             return (
-              <div className="player" key={new Date().getTime() + Math.random()}>
-                <h1>{player.username}</h1>
-                <h2 style={{textAlign: "right", margin: "5px"}}>{c + 1}</h2>
-              </div>
+              <Player username={player.username} c={c} key={new Date().getTime() + Math.random()} />
             )
           })
         }

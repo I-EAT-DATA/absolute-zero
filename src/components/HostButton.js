@@ -27,10 +27,11 @@ const HostButton = () => {
       host: user.uid , 
       isPrivate: false, 
       isStarted: false, 
-      numPlayers: 1, 
+      numPlayers: 1,
+      currentTurn: user.uid,
       scores: { 
         [user.uid]: playerData.deck.reduce((a, b) => a + b, 0)
-      }
+      },
     }
 
     ref.doc(newGameCode).set(gameData).catch((err) => console.log(err))
