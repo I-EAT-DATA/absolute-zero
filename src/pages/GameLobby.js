@@ -83,8 +83,9 @@ const GameLobby = () => {
   }, [gameData])
 
   useEffect(() => {
-    console.log(isHost);
     if (!isHost) { return; }
+
+    console.log(playerData)
 
     let newScores = {}
 
@@ -103,20 +104,50 @@ const GameLobby = () => {
   return (
     <div className="center">
 
-      {/* {
-        gameData.isStarted && <Game />
-      } */}
+      {
+        gameData && gameData.isStarted && (
+          <div className="game">
+            
+            <div className="cards">
+              <div className="card-group">
+
+                <div className="card"></div>
+                <div className="card">
+                  <h2>{gameData.faceupCard}</h2>
+                </div>
+
+              </div>
+
+              <div className="card-group">
+                {
+                  playerData[user.uid].deck.map((card, c) => {
+                    return (
+                      <div key={c} className="card">
+                        <h2>{card}</h2>
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+            
+            <br/>
+            <button className="btn">Absolute Zero</button>
+
+          </div>
+          )
+      }
 
       {
         isHost && !gameData.isStarted && <button className="btn" onClick={startGame}>Start</button>
       }
 
-      <h1>Players:</h1>
+      <h1 style={{fontSize: "3rem", margin: "10px"}}>Players:</h1>
       <div className="players">
         {
           Object.values(playerData).reverse().map((player, c) => {
             return (
-              <Player username={player.username} c={c} key={new Date().getTime() + Math.random()} />
+              <Player username={player.username} c={c} key={c} />
             )
           })
         }

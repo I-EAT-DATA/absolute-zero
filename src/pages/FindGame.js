@@ -39,9 +39,9 @@ const FindGame = () => {
 
       {isLoading && <h1>Loading...</h1>}
       {
-        games.map((game) => {
+        games.map((game, c) => {
           return (
-            <OpenGame key={new Date().getTime() + Math.random()} {...game} />
+            <OpenGame key={c} {...game} />
           )
         })
       }

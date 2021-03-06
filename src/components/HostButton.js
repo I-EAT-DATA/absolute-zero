@@ -32,6 +32,7 @@ const HostButton = () => {
       scores: { 
         [user.uid]: playerData.deck.reduce((a, b) => a + b, 0)
       },
+      faceupCard: Math.floor(Math.random() * 20) - 10 
     }
 
     ref.doc(newGameCode).set(gameData).catch((err) => console.log(err))
