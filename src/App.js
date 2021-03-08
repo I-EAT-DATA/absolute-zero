@@ -1,6 +1,9 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend }  from 'react-dnd-html5-backend' 
+
 // pages
 import Menu from './pages/Menu'
 import JoinGame from './pages/JoinGame'
@@ -20,7 +23,9 @@ function App() {
         </Route>
 
         <Route exact path={"/game"}>
-          <JoinGame />
+          <DndProvider backend={HTML5Backend}>
+            <JoinGame />
+          </DndProvider>
         </Route>
 
         <Route exact path={"/find"}>

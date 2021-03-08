@@ -262,11 +262,11 @@ Game Lobby/Game
   border-radius: var(--borderRadius);
 
   cursor: grab;
+  user-select: none;
 }
 
 .card h2 {
   font-size: var(--largeFont);
-  user-select: none;
 }
 
 .players {
