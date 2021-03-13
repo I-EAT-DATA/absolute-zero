@@ -242,12 +242,15 @@ Game Lobby/Game
   justify-content: space-around;
 
   background: rgba(0, 0, 0, 0.3);
+  box-shadow: var(--darkShadow);
   border-radius: var(--borderRadius);
   padding: 30px;
   margin: 10px;
 }
 
 .card {
+  transition: box-shadow 0.3s;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -261,13 +264,35 @@ Game Lobby/Game
   box-shadow: var(--darkShadow);
   border-radius: var(--borderRadius);
 
-  cursor: grab;
+  cursor: pointer;
   user-select: none;
+}
+
+.card.selected {
+  /* border: 5px solid #eaedc2; */
+  box-shadow: 0px 0px 12px aqua;
 }
 
 .card h2 {
   font-size: var(--largeFont);
 }
+
+.card.deck.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* .card.dragging {
+  opacity: 0.5;
+}
+
+.card.over {
+  opacity: 0.8;
+}
+
+.card.deck {
+  cursor: auto;
+} */
 
 .players {
   display: inline-flex;

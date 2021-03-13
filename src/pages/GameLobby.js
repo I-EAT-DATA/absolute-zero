@@ -1,23 +1,49 @@
-import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import useSound from 'use-sound';
+import React, { useState, useEffect, useRef } from 'react'
+// import { useHistory } from 'react-router-dom'
+// import useSound from 'use-sound';
+// import { useDrag, useDrop } from 'react-dnd';
 
 import firebase from '../firebase'
 import { useGlobalContext } from '../context'
 
 import Player from '../components/Player'
 
+// import { ItemTypes } from '../util/items'
+
 const GameLobby = () => {
   // const history = useHistory()
   // const [unlisten, setUnlisten] = useState(() => {})
 
   const ref = firebase.firestore().collection("games")
-  const { gameCode, setModalData, setInGame, user } = useGlobalContext()
+  const { gameCode, setModalData, setInGame, playerData, setPlayerData, user } = useGlobalContext()
 
   const [gameData, setGameData] = useState()
-  const [playerData, setPlayerData] = useState({})
+  const [changes, setChanges] = useState({})
+  const [players, setPlayers] = useState({})
 
   const [isHost, setIsHost] = useState(false)
+  const [canPlay, setCanPlay] = useState(false)
+
+  const faceupCard = useRef(null)
+  const [faceupSelected, setFaceupSelected] = useState(true)
+
+  // dragging functionality can come later, get the game working first
+
+  // const [{isDragging}, drag] = useDrag({
+  //   item: {
+  //     type: ItemTypes.CARD,
+  //   },
+  //   collect: monitor => ({
+  //     isDragging: !!monitor.isDragging()
+  //   })
+  // })
+
+  // const [{isOver}, drop] = useDrop({
+  //   accept: ItemTypes.CARD,
+  //   collect: monitor => ({
+  //     isOver: !!monitor.isOver()
+  //   })
+  // })
 
   const deletePlayer = () => {
     if (isHost) { return; }
@@ -40,12 +66,24 @@ const GameLobby = () => {
   const getPlayerData = () => {
     ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
       let playerDocs = {}
+      let changesObj = {}
 
       querySnapshot.forEach((doc) => { 
-        playerDocs = { ...playerDocs, [doc.id]: doc.data() } 
+        playerDocs = { ...playerDocs, [doc.id]: doc.data() }
       })
 
-      setPlayerData(playerDocs)
+      // querySnapshot.docChanges().forEach((changes) => {
+      //   playersChangesDocs = { ...playersChangesDocs, [changes.doc.id]: changes.doc.data() }
+      // })
+
+      querySnapshot.docChanges().forEach((change) => {
+        if (change.type === "modified") {
+          console.log("Modified thing: ", change.doc.data());
+        }
+      })
+
+      setChanges({})
+      setPlayers(playerDocs)
     })
   }
 
@@ -55,6 +93,15 @@ const GameLobby = () => {
     }
     else {
       setIsHost(false)
+    }
+  }
+
+  const checkCanPlay = () => {
+    if (gameData.currentTurn === user.uid) {
+      setCanPlay(true)
+    }
+    else {
+      setCanPlay(false)
     }
   }
 
@@ -79,26 +126,47 @@ const GameLobby = () => {
   useEffect(() => {
     if (!gameData) { return; }
     checkIsHost()
-    console.log(gameData)
+    checkCanPlay()
   }, [gameData])
+
+  useEffect(() => {
+    if (!playerData) { return; }
+    ref.doc(gameCode).collection("players").doc(user.uid).update(playerData)
+  }, [playerData])
 
   useEffect(() => {
     if (!isHost) { return; }
 
-    console.log(playerData)
+    console.log(changes)
 
     let newScores = {}
 
-    Object.keys(playerData).forEach((playerKey) => { 
-      newScores = { ...newScores, [playerKey]: playerData[playerKey].deck.reduce((a, b) => a + b, 0) } 
+    Object.keys(players).forEach((playerKey) => { 
+      newScores = { ...newScores, [playerKey]: players[playerKey].deck.reduce((a, b) => a + b, 0) } 
     })
 
-    ref.doc(gameCode).update({ numPlayers: Object.keys(playerData).length, scores: newScores })
+    ref.doc(gameCode).update({ numPlayers: Object.keys(players).length, scores: newScores })
     
-  }, [playerData])
+  }, [players])
 
   const startGame = () => {
     ref.doc(gameCode).update({ isStarted: true })
+  }
+
+  const selectCard = (isFaceupCard) => {
+    setFaceupSelected(isFaceupCard)
+  }
+
+  const switchCard = (c) => {
+    if (!canPlay) { return; }
+    // console.log(e.target);
+    // console.log(faceupCard.current.firstChild.innerHTML);
+
+    let newDeck = playerData.deck.map((card) => card)
+    newDeck[c] = faceupSelected ? parseInt(faceupCard.current.firstChild.innerHTML) : Math.floor(Math.random() * 20) - 10
+    setPlayerData({ ...playerData, deck: newDeck })
+
+    // setCanPlay(false)
   }
 
   return (
@@ -111,8 +179,8 @@ const GameLobby = () => {
             <div className="cards">
               <div className="card-group">
 
-                <div className="card"></div>
-                <div className="card">
+                <div className={`card ${!faceupSelected && "selected"}`} onClick={() => selectCard(false)}></div>
+                <div className={`card ${faceupSelected && "selected"}`} ref={faceupCard} onClick={() => selectCard(true)}>
                   <h2>{gameData.faceupCard}</h2>
                 </div>
 
@@ -120,9 +188,9 @@ const GameLobby = () => {
 
               <div className="card-group">
                 {
-                  playerData[user.uid].deck.map((card, c) => {
+                  playerData.deck.map((card, c) => {
                     return (
-                      <div key={c} className="card">
+                      <div key={c} className={`card deck ${!canPlay && "disabled"}`} onClick={() => switchCard(c)}>
                         <h2>{card}</h2>
                       </div>
                     )
@@ -145,7 +213,7 @@ const GameLobby = () => {
       <h1 style={{fontSize: "3rem", margin: "10px"}}>Players:</h1>
       <div className="players">
         {
-          Object.values(playerData).reverse().map((player, c) => {
+          Object.values(players).reverse().map((player, c) => {
             return (
               <Player username={player.username} c={c} key={c} />
             )
