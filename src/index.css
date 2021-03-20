@@ -311,3 +311,13 @@ Game Lobby/Game
   box-shadow: var(--darkShadow);
   border-radius: var(--borderRadius);
 }
+
+.players .player .score {
+  max-width: 70px;
+
+  margin: 5px;
+  padding: 5px;
+
+  background: #054d54;
+  border-radius: var(--borderRadius);
+}

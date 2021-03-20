@@ -30,7 +30,7 @@ const HostButton = () => {
       numPlayers: 1,
       currentTurn: user.uid,
       scores: { 
-        [user.uid]: playerData.deck.reduce((a, b) => a + b, 0)
+        [user.uid]: 0
       },
       faceupCard: Math.floor(Math.random() * 20) - 10 
     }

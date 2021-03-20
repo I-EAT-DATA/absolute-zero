@@ -18,7 +18,8 @@ const GameLobby = () => {
   const { gameCode, setModalData, setInGame, playerData, setPlayerData, user } = useGlobalContext()
 
   const [gameData, setGameData] = useState()
-  const [changes, setChanges] = useState({})
+  const [recentChangeType, setRecentChangeType] = useState({})
+  const [currentTurnIndex, setCurrentTurnIndex] = useState(0)
   const [players, setPlayers] = useState({})
 
   const [isHost, setIsHost] = useState(false)
@@ -66,23 +67,20 @@ const GameLobby = () => {
   const getPlayerData = () => {
     ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
       let playerDocs = {}
-      let changesObj = {}
+      let changeType = "none";
 
       querySnapshot.forEach((doc) => { 
         playerDocs = { ...playerDocs, [doc.id]: doc.data() }
       })
 
-      // querySnapshot.docChanges().forEach((changes) => {
-      //   playersChangesDocs = { ...playersChangesDocs, [changes.doc.id]: changes.doc.data() }
-      // })
-
       querySnapshot.docChanges().forEach((change) => {
-        if (change.type === "modified") {
-          console.log("Modified thing: ", change.doc.data());
-        }
+        changeType = change.type
+        // if (change.type === "modified") {
+        //   console.log("Modified thing: ", change.doc.data());
+        // }
       })
 
-      setChanges({})
+      setRecentChangeType(changeType)
       setPlayers(playerDocs)
     })
   }
@@ -137,15 +135,41 @@ const GameLobby = () => {
   useEffect(() => {
     if (!isHost) { return; }
 
-    console.log(changes)
+    console.log(recentChangeType)
 
-    let newScores = {}
+    let newScores = gameData.scores
+    let newFaceupCard = gameData.faceupCard
+    let newCurrentTurn = gameData.currentTurn
 
-    Object.keys(players).forEach((playerKey) => { 
-      newScores = { ...newScores, [playerKey]: players[playerKey].deck.reduce((a, b) => a + b, 0) } 
-    })
+    if (recentChangeType === "added" || recentChangeType === "removed") {
+      Object.keys(players).forEach((playerKey) => { 
+        newScores = { ...newScores, [playerKey]: 0 } 
+      })
+    }
+    else if (recentChangeType === "modified") {
+      console.log("change faceup card in gamedata and change turn, if change was absolute zero, tally scores and start at player 1 with new deck and faceup")
+      newFaceupCard = players[gameData.currentTurn].changedCard
 
-    ref.doc(gameCode).update({ numPlayers: Object.keys(players).length, scores: newScores })
+      let newCurrentTurnIndex = currentTurnIndex === Object.keys(players).length - 1 ? 0 : currentTurnIndex + 1
+
+      if (players[gameData.currentTurn].absoluteZeroPressed && players[gameData.currentTurn].deck.reduce((a, b) => a + b, 0) === 0) {
+        // TODO: new deck + new faceup
+
+        Object.keys(players).forEach((playerKey) => { 
+          newScores = { ...newScores, [playerKey]: gameData.scores[playerKey] + players[playerKey].deck.reduce((a, b) => a + b, 0) } 
+        })
+
+        newCurrentTurnIndex = 0
+      }
+
+      newCurrentTurn = Object.keys(players)[newCurrentTurnIndex]
+      console.log(newCurrentTurn);
+
+      setCurrentTurnIndex(newCurrentTurnIndex)
+
+    }
+
+    ref.doc(gameCode).update({ numPlayers: Object.keys(players).length, scores: newScores, faceupCard: newFaceupCard, currentTurn: newCurrentTurn })
     
   }, [players])
 
@@ -159,14 +183,17 @@ const GameLobby = () => {
 
   const switchCard = (c) => {
     if (!canPlay) { return; }
-    // console.log(e.target);
-    // console.log(faceupCard.current.firstChild.innerHTML);
 
     let newDeck = playerData.deck.map((card) => card)
     newDeck[c] = faceupSelected ? parseInt(faceupCard.current.firstChild.innerHTML) : Math.floor(Math.random() * 20) - 10
-    setPlayerData({ ...playerData, deck: newDeck })
+    setPlayerData({ ...playerData, deck: newDeck, changedCard: playerData.deck[c] })
 
     // setCanPlay(false)
+  }
+
+  const absoluteZero = () => {
+    if (playerData.deck.reduce((a, b) => a + b, 0) !== 0) { return; }
+    setPlayerData({ ...playerData, absoluteZeroPressed: true })
   }
 
   return (
@@ -200,7 +227,7 @@ const GameLobby = () => {
             </div>
             
             <br/>
-            <button className="btn">Absolute Zero</button>
+            <button className="btn" onClick={absoluteZero}>Absolute Zero</button>
 
           </div>
           )
@@ -213,9 +240,9 @@ const GameLobby = () => {
       <h1 style={{fontSize: "3rem", margin: "10px"}}>Players:</h1>
       <div className="players">
         {
-          Object.values(players).reverse().map((player, c) => {
+          gameData && Object.keys(players).map((playerKey, c) => {
             return (
-              <Player username={player.username} c={c} key={c} />
+              <Player username={players[playerKey].username} score={gameData.scores[playerKey]} c={c} key={c} />
             )
           })
         }
