@@ -302,6 +302,7 @@ Game Lobby/Game
 }
 
 .players .player {
+  transition: background 0.3s;
   min-width: 200px;
   margin: 10px;
   padding: 10px;
@@ -310,6 +311,10 @@ Game Lobby/Game
   background: #35504f;
   box-shadow: var(--darkShadow);
   border-radius: var(--borderRadius);
+}
+
+.players .player.pressed {
+  background: #537e53;
 }
 
 .players .player .score {

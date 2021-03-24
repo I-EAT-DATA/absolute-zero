@@ -32,7 +32,7 @@ const HostButton = () => {
       scores: { 
         [user.uid]: 0
       },
-      faceupCard: Math.floor(Math.random() * 20) - 10 
+      faceupCard: Math.floor(Math.random() * 20) - 10
     }
 
     ref.doc(newGameCode).set(gameData).catch((err) => console.log(err))

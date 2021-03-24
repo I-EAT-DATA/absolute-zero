@@ -7,6 +7,8 @@ import firebase from '../firebase'
 import { useGlobalContext } from '../context'
 
 import Player from '../components/Player'
+import Card from '../components/Card'
+import HostButton from '../components/HostButton'
 
 // import { ItemTypes } from '../util/items'
 
@@ -21,6 +23,8 @@ const GameLobby = () => {
   const [recentChangeType, setRecentChangeType] = useState({})
   const [currentTurnIndex, setCurrentTurnIndex] = useState(0)
   const [players, setPlayers] = useState({})
+
+  const [winner, setWinner] = useState("")
 
   const [isHost, setIsHost] = useState(false)
   const [canPlay, setCanPlay] = useState(false)
@@ -64,7 +68,7 @@ const GameLobby = () => {
     })
   }
 
-  const getPlayerData = () => {
+  const getPlayers = () => {
     ref.doc(gameCode).collection("players").onSnapshot((querySnapshot) => {
       let playerDocs = {}
       let changeType = "none";
@@ -106,7 +110,7 @@ const GameLobby = () => {
   useEffect(() => {
 
     getGameData()
-    getPlayerData()
+    getPlayers()
 
     window.addEventListener("beforeunload", deletePlayer)
     // setUnlisten(history.listen((route) => {
@@ -123,6 +127,7 @@ const GameLobby = () => {
 
   useEffect(() => {
     if (!gameData) { return; }
+    console.log(gameData);
     checkIsHost()
     checkCanPlay()
   }, [gameData])
@@ -147,7 +152,7 @@ const GameLobby = () => {
       })
     }
     else if (recentChangeType === "modified") {
-      console.log("change faceup card in gamedata and change turn, if change was absolute zero, tally scores and start at player 1 with new deck and faceup")
+      // console.log("change faceup card in gamedata and change turn, if change was absolute zero, tally scores and start at player 1 with new deck and faceup")
       newFaceupCard = players[gameData.currentTurn].changedCard
 
       let newCurrentTurnIndex = currentTurnIndex === Object.keys(players).length - 1 ? 0 : currentTurnIndex + 1
@@ -155,18 +160,25 @@ const GameLobby = () => {
       if (players[gameData.currentTurn].absoluteZeroPressed && players[gameData.currentTurn].deck.reduce((a, b) => a + b, 0) === 0) {
         // TODO: new deck + new faceup
 
-        Object.keys(players).forEach((playerKey) => { 
-          newScores = { ...newScores, [playerKey]: gameData.scores[playerKey] + players[playerKey].deck.reduce((a, b) => a + b, 0) } 
-        })
+        // Object.keys(players).forEach((playerKey) => { 
+        //   newScores = { ...newScores, [playerKey]: gameData.scores[playerKey] + players[playerKey].deck.reduce((a, b) => a + b, 0) } 
 
-        newCurrentTurnIndex = 0
+        //   let newDeck = playerData.deck.map(() => Math.floor(Math.random() * 20) - 10)
+        //   ref.doc(gameCode).collection("players").doc(playerKey).update({ deck: newDeck, absoluteZeroPressed: false })
+        // })
+
+        // console.log(newFaceupCard)
+
+        // newCurrentTurnIndex = 0
+        // ref.doc(gameCode).collection("players").doc(Object.keys(players)[0]).update({ changedCard: Math.floor(Math.random() * 20) - 10 })
+        setWinner(gameData.currentTurn)
+      }
+      else if (players[gameData.currentTurn].absoluteZeroPressed && players[gameData.currentTurn].deck.reduce((a, b) => a + b, 0) !== 0) {
+        ref.doc(gameCode).collection("players").doc(gameData.currentTurn).update({ absoluteZeroPressed: false })
       }
 
       newCurrentTurn = Object.keys(players)[newCurrentTurnIndex]
-      console.log(newCurrentTurn);
-
       setCurrentTurnIndex(newCurrentTurnIndex)
-
     }
 
     ref.doc(gameCode).update({ numPlayers: Object.keys(players).length, scores: newScores, faceupCard: newFaceupCard, currentTurn: newCurrentTurn })
@@ -184,16 +196,44 @@ const GameLobby = () => {
   const switchCard = (c) => {
     if (!canPlay) { return; }
 
-    let newDeck = playerData.deck.map((card) => card)
+    console.log(c);
+
+    let newDeck = players[user.uid].deck.map((card) => card)
     newDeck[c] = faceupSelected ? parseInt(faceupCard.current.firstChild.innerHTML) : Math.floor(Math.random() * 20) - 10
+    // ref.doc(gameCode).collection("players").doc(user.uid).update({ deck: newDeck })
     setPlayerData({ ...playerData, deck: newDeck, changedCard: playerData.deck[c] })
 
     // setCanPlay(false)
   }
 
   const absoluteZero = () => {
-    if (playerData.deck.reduce((a, b) => a + b, 0) !== 0) { return; }
+    if (players[user.uid].deck.reduce((a, b) => a + b, 0) !== 0) { return; }
+
     setPlayerData({ ...playerData, absoluteZeroPressed: true })
+  }
+
+  if (winner) {
+    return (
+      <div className="center">
+        <h2>{players[winner].username} Won With Absolute Zero!</h2>
+
+        <div className="card-group">
+          {
+            players[winner].deck.map((card, c) => {
+              return (
+                <div key={c} className="card deck">
+                  <h2>{card}</h2>
+                </div>
+              )
+            })
+          }
+        </div>
+
+        <br/>
+        <HostButton />
+
+      </div>
+    )
   }
 
   return (
@@ -215,7 +255,7 @@ const GameLobby = () => {
 
               <div className="card-group">
                 {
-                  playerData.deck.map((card, c) => {
+                  players[user.uid].deck.map((card, c) => {
                     return (
                       <div key={c} className={`card deck ${!canPlay && "disabled"}`} onClick={() => switchCard(c)}>
                         <h2>{card}</h2>
@@ -242,7 +282,7 @@ const GameLobby = () => {
         {
           gameData && Object.keys(players).map((playerKey, c) => {
             return (
-              <Player username={players[playerKey].username} score={gameData.scores[playerKey]} c={c} key={c} />
+              <Player username={players[playerKey].username} absoluteZeroPressed={players[playerKey].absoluteZeroPressed} score={gameData.scores[playerKey]} c={c} key={c} />
             )
           })
         }

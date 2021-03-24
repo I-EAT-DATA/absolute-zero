@@ -6,7 +6,7 @@ const AppContext = React.createContext()
 
 const AppProvider = ({ children }) => {
   // firebase.firestore.FieldValue.serverTimestamp()
-  const [playerData, setPlayerData] = useState({ username: "", absoluteZeroPressed: false, deck: [], changedCard: 0 })
+  const [playerData, setPlayerData] = useState({ username: "", absoluteZeroPressed: false, deck: [], changedCard: Math.floor(Math.random() * 20) - 10})
   const [gameCode, setGameCode] = useState("")
   const [modalData, setModalData] = useState({ isModalOpen: false, modalContent: "" })
   const [inGame, setInGame] = useState(false)
